@@ -81,30 +81,30 @@ GUIDE_TEXT = [
 ]
 
 API_REFERENCE = {
-    "Read Functions": [
-        ("get_my_health()", "→ int"),
-        ("get_my_energy()", "→ int"),
-        ("get_opponent_player_position()", "→ Vector2"),
-        ("get_opponent_energy_ball_position()", "→ Vector2"),
-        ("get_opponent_player_velocity()", "→ Vector2"),
-        ("get_elapsed_time()", "→ float (seconds)"),
-        ("get_opponent_combo()", "→ int (0-5)"),
-        ("get_phase()", "→ int (0-5)"),
-        ("get_available_traps()", "→ [int]"),
-        ("get_cooldown_time(trap_id)", "→ float"),
+    "Read Functions (use client. prefix)": [
+        ("client.get_my_health()", "→ int"),
+        ("client.get_my_energy()", "→ int"),
+        ("client.get_opponent_player_position()", "→ Vector2"),
+        ("client.get_opponent_energy_ball_position()", "→ Vector2"),
+        ("client.get_opponent_player_velocity()", "→ Vector2"),
+        ("client.get_elapsed_time()", "→ float (seconds)"),
+        ("client.get_opponent_combo()", "→ int (0-5)"),
+        ("client.get_phase()", "→ int (0-5)"),
+        ("client.get_available_traps()", "→ [int]"),
+        ("client.get_cooldown_time(trap_id)", "→ float"),
     ],
-    "Actions": [("heal()", "→ dict or ApiError")],
-    "Traps": [
-        ("spawn_trap1(pos)", "mine, cost 5"),
-        ("spawn_trap2(time, radius)", "ring, cost 15"),
-        ("spawn_trap3(pos, dir, speed)", "seagull, cost 13"),
-        ("spawn_trap4(pos, dir)", "tsunami, cost 20"),
-        ("spawn_trap5(pos)", "slippery, cost 5"),
-        ("spawn_trap6(dir, speed)", "dance, cost 20"),
-        ("spawn_trap7(pos, rate)", "ripple, cost 20"),
-        ("spawn_trap8(start, end)", "crack, cost 15"),
-        ("spawn_trap9(start, end, air)", "watermelon, cost 12"),
-        ("spawn_trap10(pos, d1,d2,d3)", "shotgun, cost 15"),
+    "Actions": [("client.heal()", "→ dict or ApiError")],
+    "Traps (use client. prefix)": [
+        ("client.spawn_trap1(pos)", "mine, cost 5"),
+        ("client.spawn_trap2(time, radius)", "ring, cost 15"),
+        ("client.spawn_trap3(pos, dir, speed)", "seagull, cost 13"),
+        ("client.spawn_trap4(pos, dir)", "tsunami, cost 20"),
+        ("client.spawn_trap5(pos)", "slippery, cost 5"),
+        ("client.spawn_trap6(dir, speed)", "dance, cost 20"),
+        ("client.spawn_trap7(pos, rate)", "ripple, cost 20"),
+        ("client.spawn_trap8(start, end)", "crack, cost 15"),
+        ("client.spawn_trap9(start, end, air)", "watermelon, cost 12"),
+        ("client.spawn_trap10(pos, d1,d2,d3)", "shotgun, cost 15"),
     ],
     "Types": [
         ("Vector2(x, y)", "2D coordinate"),
@@ -185,42 +185,47 @@ import math
 import random
 ```
 
-## Entry Point
+## Entry Point (example structure)
 ```python
 def run(client):
+    client.print_api_errors = False
     while True:
+        health = client.get_my_health()
+        energy = client.get_my_energy()
+        pos = client.get_opponent_player_position()
         # your logic here
+        client.spawn_trap1(pos)
+        result = client.heal()
 ```
 
-## Available API
+## Available API (all methods must be called via `client.` prefix)
 
 ### Read Functions
-- `get_my_health() -> int`
-- `get_my_energy() -> int`
-- `get_opponent_player_position() -> Vector2`
-- `get_opponent_energy_ball_position() -> Vector2`
-- `get_opponent_player_velocity() -> Vector2`
-- `get_elapsed_time() -> float`
-- `get_opponent_combo() -> int`
-- `get_phase() -> int` (0-5)
-- `get_available_traps() -> list[int]`
-- `get_cooldown_time(trap_id: int) -> float`
+- `client.get_my_health() -> int`
+- `client.get_my_energy() -> int`
+- `client.get_opponent_player_position() -> Vector2`
+- `client.get_opponent_energy_ball_position() -> Vector2`
+- `client.get_opponent_player_velocity() -> Vector2`
+- `client.get_elapsed_time() -> float`
+- `client.get_opponent_combo() -> int`
+- `client.get_phase() -> int` (0-5)
+- `client.get_available_traps() -> list[int]`
+- `client.get_cooldown_time(trap_id: int) -> float`
 
 ### Heal
-- `heal()` — heals 2 HP, max 2 uses per game
+- `client.heal()` — heals 2 HP, max 2 uses per game
 
-### Traps (10 types)
-For each trap, call `client.spawn_trapN(...)`. Each returns `dict` on success or `ApiError` on failure.
-1. `spawn_trap1(position: Vector2)` — mine, cost 5, cooldown 2s, damage trap
-2. `spawn_trap2(time: float, radius: float)` — tracking ring, cost 15, cooldown 5s, reveals and damages
-3. `spawn_trap3(position: Vector2, direction: Vector2, speed: float)` — seagull, cost 13, cooldown 4s, projectile trap
-4. `spawn_trap4(position: Vector2, direction: Vector2)` — tsunami, cost 20, cooldown 8s, pushes opponent
-5. `spawn_trap5(position: Vector2)` — slippery floor, cost 5, cooldown 3s, makes opponent slide
-6. `spawn_trap6(direction: Direction, speed: float)` — dance line, cost 20, cooldown 8s, forces jump
-7. `spawn_trap7(position: Vector2, rate: float)` — ripple, cost 20, cooldown 8s, periodic wave
-8. `spawn_trap8(start: Vector2, end: Vector2)` — crack, cost 15, cooldown 5s, line trap
-9. `spawn_trap9(start: Vector2, end: Vector2, air_time: float)` — watermelon, cost 12, cooldown 5s, parabolic
-10. `spawn_trap10(position: Vector2, dir1: Vector2, dir2: Vector2, dir3: Vector2)` — shotgun, cost 15, cooldown 6s
+### Traps (10 types, all called via `client.`)
+1. `client.spawn_trap1(position: Vector2)` — mine, cost 5, cooldown 2s, damage trap
+2. `client.spawn_trap2(time: float, radius: float)` — tracking ring, cost 15, cooldown 5s, reveals and damages
+3. `client.spawn_trap3(position: Vector2, direction: Vector2, speed: float)` — seagull, cost 13, cooldown 4s, projectile trap
+4. `client.spawn_trap4(position: Vector2, direction: Vector2)` — tsunami, cost 20, cooldown 8s, pushes opponent
+5. `client.spawn_trap5(position: Vector2)` — slippery floor, cost 5, cooldown 3s, makes opponent slide
+6. `client.spawn_trap6(direction: Direction, speed: float)` — dance line, cost 20, cooldown 8s, forces jump
+7. `client.spawn_trap7(position: Vector2, rate: float)` — ripple, cost 20, cooldown 8s, periodic wave
+8. `client.spawn_trap8(start: Vector2, end: Vector2)` — crack, cost 15, cooldown 5s, line trap
+9. `client.spawn_trap9(start: Vector2, end: Vector2, air_time: float)` — watermelon, cost 12, cooldown 5s, parabolic
+10. `client.spawn_trap10(position: Vector2, dir1: Vector2, dir2: Vector2, dir3: Vector2)` — shotgun, cost 15, cooldown 6s
 
 ### Types
 - `Vector2(x: float, y: float)` — 2D coordinate with `.x` and `.y` properties
@@ -237,7 +242,8 @@ if isinstance(result, ApiError):
 - Output ONLY the Python code, no explanation or markdown (no ```python either)
 - Include `client.print_api_errors = False` at the start of run()
 - Print status every ~2 seconds with print()
-- Use print() for debug output"""
+- Use print() for debug output
+- CRITICAL: All API calls MUST use client. prefix — e.g. `client.get_my_health()`, `client.spawn_trap1(pos)`, `client.heal()`. Never call API functions without `client.`."""
 
 
 def gemini_generate(api_key: str, model: str, strategy: str, timeout: int = 120) -> str:
